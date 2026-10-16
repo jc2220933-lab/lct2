@@ -12,29 +12,30 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
       background-color: #030712;
       color: #f1f5f9;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      overflow-x: hidden;
+      overflow: hidden;
     }
     #phoneContainer {
       width: 100%;
       max-width: 430px;
-      min-height: 100vh;
+      height: 100%;
       background-color: #080c14;
       display: flex;
       flex-direction: column;
       position: relative;
-      border: 1px solid #1e293b;
+      overflow: hidden;
     }
     @media (min-width: 640px) {
       #phoneContainer {
-        min-height: 880px;
-        max-height: 920px;
+        height: 94vh;
+        max-height: 900px;
         border-radius: 36px;
         border: 2px solid #1e293b;
         box-shadow: 0 25px 50px -12px rgba(0,0,0,0.85);
@@ -43,14 +44,13 @@
 
     /* Header */
     .app-header {
+      flex-shrink: 0;
       background: #080c14;
       padding: 14px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #1e293b;
-      position: sticky;
-      top: 0;
       z-index: 30;
     }
     .app-logo {
@@ -82,12 +82,15 @@
       cursor: pointer;
     }
 
-    /* Contenido deslizable */
+    /* Área con scroll */
     .main-scroll {
       flex: 1;
+      overflow-y: auto;
       padding: 14px;
-      padding-bottom: 100px;
+      padding-bottom: 85px;
+      scrollbar-width: none;
     }
+    .main-scroll::-webkit-scrollbar { display: none; }
 
     /* Tarjetas */
     .gold-box {
@@ -106,7 +109,7 @@
       margin-bottom: 14px;
     }
 
-    /* Canvas Hero */
+    /* Video Hero */
     .video-hero-box {
       width: 100%;
       height: 185px;
@@ -120,12 +123,13 @@
       justify-content: center;
     }
     canvas#heroCanvas {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
-      display: block;
     }
 
-    /* 9 Botones */
+    /* Cuadrícula 9 Botones */
     .grid-9 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -168,21 +172,20 @@
       stroke-linejoin: round;
     }
 
-    /* Barra inferior */
+    /* Barra Inferior Fija */
     .nav-bar {
-      position: fixed;
+      position: absolute;
       bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 430px;
-      height: 70px;
+      left: 0;
+      right: 0;
+      height: 68px;
       background: #080c14;
       border-top: 1px solid #1e293b;
       display: flex;
       justify-content: space-around;
       align-items: center;
       z-index: 50;
+      padding-bottom: 4px;
     }
     .nav-item {
       display: flex;
@@ -193,7 +196,9 @@
       font-weight: 700;
       cursor: pointer;
       gap: 4px;
+      user-select: none;
       padding: 6px 12px;
+      border-radius: 10px;
     }
     .nav-item.active { color: #f5c044; }
     .nav-item svg {
@@ -234,7 +239,7 @@
 
     /* Modales */
     .modal-backdrop {
-      position: fixed;
+      position: absolute;
       inset: 0;
       background: rgba(0, 0, 0, 0.88);
       backdrop-filter: blur(5px);
@@ -247,7 +252,7 @@
 
     /* Toast */
     #toast {
-      position: fixed;
+      position: absolute;
       top: 65px;
       left: 50%;
       transform: translateX(-50%);
@@ -261,6 +266,7 @@
       z-index: 999;
       display: none;
       text-align: center;
+      max-width: 90%;
       box-shadow: 0 10px 25px rgba(0,0,0,0.8);
     }
   </style>
@@ -270,10 +276,10 @@
   <div id="phoneContainer">
     <div id="toast">Notificación</div>
 
-    <!-- HEADER -->
+    <!-- HEADER OFICIAL -->
     <div class="app-header">
       <div class="app-logo" onclick="switchTab('inicio')">LCT <span>2.0</span></div>
-      <div class="header-right">
+      <div style="display:flex; align-items:center; gap:8px;">
         <div class="badge-vip" id="headerVipBadge" onclick="switchTab('vip')">VIP 1</div>
         <div id="adminTopBtn" onclick="openModal('modalAdmin')" style="display:none; background:#1e3a8a; border:1px solid #3b82f6; color:#93c5fd; padding:4px 10px; border-radius:8px; font-size:10px; font-weight:800; cursor:pointer;">⚙️ Admin</div>
       </div>
@@ -292,9 +298,10 @@
       </div>
 
       <div style="background:#101726; border:1px solid #1e293b; border-radius:12px; padding:10px 12px; margin-bottom:14px; font-size:11px;">
-        📢 <strong id="newsMarquee">Noticias: Retiros de 10:00 AM a 4:00 PM • Recargas 8:00 AM a 12:00 AM • Comisiones 20%, 3%, 2%, 1%</strong>
+        📢 <strong>Noticias: Retiros de 10:00 AM a 4:00 PM • Recargas 8:00 AM a 12:00 AM • Comisiones 20%, 3%, 2%, 1%</strong>
       </div>
 
+      <!-- Cuadrícula Oficial de 9 Botones -->
       <div class="grid-9">
         <div class="btn-grid" onclick="openModal('modalRecharge')">
           <svg viewBox="0 0 24 24"><path d="m16 3 4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16"/></svg>
@@ -357,6 +364,7 @@
       <div class="gold-box">
         <div style="font-size: 11px; font-weight: 800; color: #f5c044;" id="taskVipTitle">TAREAS ACTIVAS • VIP 1</div>
         <h3 style="font-size: 15px; font-weight: 900; color: #fff; margin-top: 2px;">Videos de 10 Segundos</h3>
+        <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Mira tus videos diarios para acreditar tus ganancias en RD$.</p>
       </div>
       <div class="card-dark" id="taskContainer"></div>
     </div>
@@ -484,10 +492,4 @@
       <div class="card-dark" style="width: 100%; max-width: 380px;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
           <h3 style="font-size: 13px; font-weight: 800; color: #f5c044;">Fondeo Express (Recarga)</h3>
-          <span onclick="closeModal('modalRecharge')" style="cursor: pointer; color: #94a3b8; font-size: 16px;">✕</span>
-        </div>
-        <div style="background: #030712; padding: 8px; border-radius: 8px; font-size: 11px; margin-bottom: 10px;">
-          <div>Banco: <strong>Banco Popular Dominicano</strong></div>
-          <div>Cuenta: <strong style="color: #f5c044;">8392-1092-44</strong></div>
-          <div>Titular: <strong>LCT Servicios Digitales SRL</strong></div>
- 
+          <span onclick="closeModal('modalRecharge')" style="cursor: pointer; color: #94a3b8; font-size: 16px;">
