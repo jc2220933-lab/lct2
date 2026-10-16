@@ -44,14 +44,14 @@
 
     /* Cuadrícula 9 Botones */
     .grid-9 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-    .btn-grid { background: #101726; border: 1px solid #1e293b; border-radius: 14px; padding: 14px 6px; text-align: center; color: #f1f5f9; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; }
+    .btn-grid { background: #101726; border: 1px solid #1e293b; border-radius: 14px; padding: 14px 6px; text-align: center; color: #f1f5f9; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; user-select: none; }
     .btn-grid:active { transform: scale(0.97); }
     .btn-grid.special { background: #231604; border-color: #f5c044; color: #fcd34d; box-shadow: 0 0 12px rgba(245, 192, 68, 0.15); }
     .btn-grid svg { width: 22px; height: 22px; fill: none; stroke: #f5c044; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
     /* Navegación Inferior */
     .nav-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 65px; background: #080c14; border-top: 1px solid #1e293b; display: flex; justify-content: space-around; align-items: center; z-index: 40; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; color: #64748b; font-size: 10px; font-weight: 700; cursor: pointer; gap: 4px; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; color: #64748b; font-size: 10px; font-weight: 700; cursor: pointer; gap: 4px; user-select: none; }
     .nav-item.active { color: #f5c044; }
     .nav-item svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
@@ -307,4 +307,312 @@
 
         <div id="formRegister" style="display: none;">
           <input type="text" id="regUsername" class="input-field" placeholder="Nombre de usuario">
-          <input type="email" id=
+          <input type="email" id="regEmail" class="input-field" placeholder="Correo">
+          <input type="tel" id="regPhone" class="input-field" placeholder="Teléfono">
+          <input type="password" id="regPass1" class="input-field" placeholder="Contraseña">
+          <input type="password" id="regPass2" class="input-field" placeholder="Confirmar contraseña">
+          <input type="text" id="regRef" class="input-field" placeholder="Código de referido">
+          <button class="btn-gold" onclick="handleStaticRegister()">Crear Cuenta</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="modalWithdraw" class="modal-backdrop" style="display: none;">
+      <div class="card-dark" style="width: 100%; max-width: 380px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <h3 style="font-size: 13px; font-weight: 800; color: #fff;">Retiro Rápido (Comisión 20%)</h3>
+          <span onclick="closeModal('modalWithdraw')" style="cursor: pointer; color: #94a3b8;">✕</span>
+        </div>
+        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 8px; padding: 8px; font-size: 10px; color: #fca5a5; margin-bottom: 10px;">
+          Horario: 10:00 AM a 4:00 PM • 1 retiro al día
+        </div>
+        <input type="number" id="withdrawInput" class="input-field" placeholder="Monto RD$ (Mínimo 300)" oninput="calcWithdrawalFee()">
+        <div style="background: #030712; padding: 8px; border-radius: 8px; font-size: 11px; margin-bottom: 10px;">
+          <div>Neto en tu cuenta: <strong id="calcNetVal" style="color: #22c55e;">RD$ 0.00</strong></div>
+        </div>
+        <input type="password" maxlength="4" id="withdrawPinInput" class="input-field" placeholder="PIN de 4 dígitos">
+        <button class="btn-gold" onclick="submitStaticWithdrawal()">Solicitar Retiro</button>
+      </div>
+    </div>
+
+    <div id="modalRecharge" class="modal-backdrop" style="display: none;">
+      <div class="card-dark" style="width: 100%; max-width: 380px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <h3 style="font-size: 13px; font-weight: 800; color: #f5c044;">Fondeo Express (Recarga)</h3>
+          <span onclick="closeModal('modalRecharge')" style="cursor: pointer; color: #94a3b8;">✕</span>
+        </div>
+        <div style="background: #030712; padding: 8px; border-radius: 8px; font-size: 11px; margin-bottom: 10px;">
+          <div>Banco: <strong>Banco Popular Dominicano</strong></div>
+          <div>Cuenta: <strong style="color: #f5c044;">8392-1092-44</strong></div>
+          <div>Titular: <strong>LCT Servicios Digitales SRL</strong></div>
+        </div>
+        <input type="number" id="rechargeInput" class="input-field" placeholder="Monto en RD$">
+        <input type="text" id="rechargeRefInput" class="input-field" placeholder="Referencia de pago">
+        <button class="btn-gold" onclick="submitStaticDeposit()">Notificar Depósito</button>
+      </div>
+    </div>
+
+    <div id="modalRoulette" class="modal-backdrop" style="display: none;">
+      <div class="card-dark" style="width: 100%; max-width: 380px; text-align: center;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <h3 style="font-size: 14px; font-weight: 900; color: #f5c044;">Ruleta LCT</h3>
+          <span onclick="closeModal('modalRoulette')" style="cursor: pointer; color: #94a3b8;">✕</span>
+        </div>
+        <div id="wheelBox" style="width: 180px; height: 180px; margin: 10px auto; border-radius: 50%; border: 4px solid #f5c044; background: radial-gradient(circle, #251704 0%, #030712 100%); display: flex; align-items: center; justify-content: center;">
+          <div style="font-weight: 900; color: #f5c044; font-size: 18px;">LCT</div>
+        </div>
+        <button class="btn-gold" onclick="spinStaticRoulette()">Girar Ruleta</button>
+      </div>
+    </div>
+
+    <div id="modalAdmin" class="modal-backdrop" style="display: none;">
+      <div class="card-dark" style="width: 100%; max-width: 410px; max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
+          <h2 style="font-size: 15px; font-weight: 900; color: #f5c044;">Backoffice LCT 2.0</h2>
+          <span onclick="closeModal('modalAdmin')" style="cursor: pointer; color: #fff;">✕</span>
+        </div>
+        <div style="font-size: 11px; color: #94a3b8; margin-bottom: 10px;">Panel administrativo activo para: cruzfrancis075@gmail.com</div>
+        <div style="background: #030712; padding: 10px; border-radius: 8px; margin-bottom: 8px;">
+          <div style="font-weight: bold; color: #f5c044; margin-bottom: 4px;">Ajustar Saldo de Usuario</div>
+          <button class="btn-gold" style="padding: 6px; font-size: 11px; margin-bottom: 4px;" onclick="adminAddBal(500)">+ Añadir RD$ 500</button>
+          <button class="btn-gold" style="padding: 6px; font-size: 11px; background: #991b1b; color: #fff;" onclick="adminAddBal(-500)">- Restar RD$ 500</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let userData = {
+      username: 'Francisco Cruz',
+      email: 'cruzfrancis075@gmail.com',
+      balance: 1250.00,
+      vipLevel: 1,
+      withdrawPin: '1234',
+      spinsAvailable: 1
+    };
+
+    const VIP_LEVELS = [
+      { id: 1, name: "VIP 1", cost: 600, daily: 90, videos: 3 },
+      { id: 2, name: "VIP 2", cost: 1200, daily: 180, videos: 4 },
+      { id: 3, name: "VIP 3", cost: 2600, daily: 390, videos: 5 },
+      { id: 4, name: "VIP 4", cost: 5500, daily: 700, videos: 5 },
+      { id: 5, name: "VIP 5", cost: 10700, daily: 1498, videos: 5 },
+      { id: 6, name: "VIP 6", cost: 27000, daily: 3780, videos: 6 },
+      { id: 7, name: "VIP 7", cost: 60000, daily: 8400, videos: 8 },
+      { id: 8, name: "VIP 8", cost: 125000, daily: 16250, videos: 10 }
+    ];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderHeroAnimation();
+      renderVipCatalog();
+      renderTasks();
+      updateUI();
+    });
+
+    function updateUI() {
+      const formatted = userData.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('profileBalanceDisplay').innerText = formatted;
+      document.getElementById('profileUsername').innerText = userData.username;
+      document.getElementById('headerVipBadge').innerText = 'VIP ' + userData.vipLevel;
+      document.getElementById('profileVipBadge').innerText = 'VIP ' + userData.vipLevel;
+
+      if (userData.email.toLowerCase() === 'cruzfrancis075@gmail.com') {
+        document.getElementById('adminTopBtn').style.display = 'block';
+      }
+    }
+
+    function switchTab(tabId) {
+      ['inicio', 'tarea', 'equipo', 'vip', 'perfil'].forEach(id => {
+        const el = document.getElementById('tab-' + id);
+        const nav = document.getElementById('nav-' + id);
+        if (el) el.style.display = (id === tabId) ? 'block' : 'none';
+        if (nav) nav.classList.toggle('active', id === tabId);
+      });
+    }
+
+    function renderVipCatalog() {
+      const c = document.getElementById('vipCatalogContainer');
+      c.innerHTML = VIP_LEVELS.map(v => `
+        <div class="card-dark" style="${v.id === userData.vipLevel ? 'border-color:#f5c044;' : ''}">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="color:#f5c044; font-size:14px;">${v.name}</strong>
+            <span style="font-weight:bold;">Costo: RD$ ${v.cost.toLocaleString()}</span>
+          </div>
+          <div style="color:#22c55e; font-size:11px; margin:4px 0;">Ganancia Diaria: RD$ ${v.daily.toLocaleString()} (${v.videos} videos)</div>
+          ${v.id === userData.vipLevel ? `
+            <button style="width:100%; background:rgba(245,192,68,0.2); border:1px solid #f5c044; color:#f5c044; padding:8px; border-radius:8px; font-weight:bold;">Nivel Activo</button>
+          ` : `
+            <button onclick="upgradeVipStatic(${v.id}, ${v.cost})" class="btn-gold" style="padding:8px; font-size:11px;">Activar ${v.name} (Reembolso anterior)</button>
+          `}
+        </div>
+      `).join('');
+    }
+
+    function upgradeVipStatic(newId, newCost) {
+      const curVip = VIP_LEVELS.find(x => x.id === userData.vipLevel);
+      const refund = curVip ? curVip.cost : 0;
+      userData.balance += refund;
+
+      if (userData.balance < newCost) {
+        userData.balance -= refund;
+        return showToast('Saldo insuficiente para subir de VIP.');
+      }
+
+      userData.balance -= newCost;
+      userData.vipLevel = newId;
+      updateUI();
+      renderVipCatalog();
+      renderTasks();
+      showToast(`¡Activaste VIP ${newId}! Reembolso de RD$ ${refund} aplicado.`);
+    }
+
+    function renderTasks() {
+      const c = document.getElementById('taskListContainer');
+      const cur = VIP_LEVELS.find(x => x.id === userData.vipLevel) || VIP_LEVELS[0];
+      const rew = Math.round(cur.daily / cur.videos);
+      document.getElementById('taskCurrentVipTitle').innerText = 'TAREAS ACTIVAS • ' + cur.name;
+
+      c.innerHTML = '';
+      for (let i = 1; i <= cur.videos; i++) {
+        c.innerHTML += `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#030712; border-radius:10px; border:1px solid #1e293b; margin-bottom:8px;">
+            <div><strong>Video Tarea #${i}</strong><div style="font-size:10px; color:#22c55e;">+ RD$ ${rew} (10s)</div></div>
+            <button class="btn-gold" style="width:auto; padding:6px 14px; font-size:11px;" onclick="completeVideoTask(${rew})">Mirar 10s</button>
+          </div>
+        `;
+      }
+    }
+
+    function completeVideoTask(reward) {
+      showToast('Reproduciendo tarea de 10s...');
+      setTimeout(() => {
+        userData.balance += reward;
+        updateUI();
+        showToast(`¡Tarea completada! +RD$ ${reward} acreditados.`);
+      }, 1500);
+    }
+
+    function calcWithdrawalFee() {
+      const a = parseFloat(document.getElementById('withdrawInput').value) || 0;
+      document.getElementById('calcNetVal').innerText = 'RD$ ' + (a * 0.8).toFixed(2);
+    }
+
+    function submitStaticWithdrawal() {
+      const a = parseFloat(document.getElementById('withdrawInput').value) || 0;
+      const pin = document.getElementById('withdrawPinInput').value.trim();
+      if (a < 300) return showToast('Mínimo de retiro: RD$ 300.00');
+      if (a > userData.balance) return showToast('Saldo insuficiente.');
+      if (pin !== userData.withdrawPin) return showToast('PIN de retiro incorrecto.');
+
+      userData.balance -= a;
+      updateUI();
+      closeModal('modalWithdraw');
+      showToast(`Retiro de RD$ ${(a * 0.8).toFixed(2)} neto enviado.`);
+    }
+
+    function submitStaticDeposit() {
+      const a = parseFloat(document.getElementById('rechargeInput').value) || 0;
+      if (a <= 0) return showToast('Ingresa un monto válido.');
+      userData.balance += a;
+      updateUI();
+      closeModal('modalRecharge');
+      showToast(`¡Depósito de RD$ ${a} acreditado con éxito!`);
+    }
+
+    function spinStaticRoulette() {
+      const wheel = document.getElementById('wheelBox');
+      wheel.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+      wheel.style.transform = `rotate(${1080 + Math.floor(Math.random() * 360)}deg)`;
+      setTimeout(() => {
+        userData.balance += 50;
+        updateUI();
+        showToast('¡Ganaste RD$ 50 en la Ruleta LCT!');
+      }, 3100);
+    }
+
+    function handleStaticLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      userData.email = email;
+      closeModal('modalAuth');
+      updateUI();
+      showToast('¡Bienvenido a LCT 2.0!');
+    }
+
+    function handleStaticRegister() {
+      const u = document.getElementById('regUsername').value.trim();
+      if (u) userData.username = u;
+      closeModal('modalAuth');
+      updateUI();
+      showToast('¡Registro completado!');
+    }
+
+    function adminAddBal(amt) {
+      userData.balance = Math.max(0, userData.balance + amt);
+      updateUI();
+      showToast(`Saldo ajustado por RD$ ${amt}`);
+    }
+
+    function openAdminPanel() { openModal('modalAdmin'); }
+    function openRechargeModal() { openModal('modalRecharge'); }
+    function openWithdrawModal() { openModal('modalWithdraw'); }
+    function openRouletteModal() { openModal('modalRoulette'); }
+    function logoutUser() { openModal('modalAuth'); }
+    function copyRefCode() {
+      navigator.clipboard.writeText(document.getElementById('userRefCodeField').value);
+      showToast('Código copiado al portapapeles.');
+    }
+
+    function setAuthMode(m) {
+      document.getElementById('formLogin').style.display = (m === 'login') ? 'block' : 'none';
+      document.getElementById('formRegister').style.display = (m === 'register') ? 'block' : 'none';
+      document.getElementById('authTabLogin').style.background = (m === 'login') ? '#f5c044' : 'transparent';
+      document.getElementById('authTabLogin').style.color = (m === 'login') ? '#000' : '#94a3b8';
+      document.getElementById('authTabRegister').style.background = (m === 'register') ? '#f5c044' : 'transparent';
+      document.getElementById('authTabRegister').style.color = (m === 'register') ? '#000' : '#94a3b8';
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function showToast(m) {
+      const t = document.getElementById('toast');
+      t.innerText = m;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 2600);
+    }
+
+    function renderHeroAnimation() {
+      const cvs = document.getElementById('heroCanvas');
+      if (!cvs) return;
+      const ctx = cvs.getContext('2d');
+      let t = 0;
+      function loop() {
+        ctx.fillStyle = '#060b14';
+        ctx.fillRect(0, 0, cvs.width, cvs.height);
+        ctx.strokeStyle = '#f5c044';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let x = 0; x < cvs.width; x++) {
+          let y = 90 + Math.sin((x + t) * 0.03) * 30;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.fillStyle = '#f5c044';
+        ctx.beginPath();
+        ctx.arc(cvs.width / 2, cvs.height / 2, 22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#080c14';
+        ctx.beginPath();
+        ctx.moveTo(cvs.width / 2 - 6, cvs.height / 2 - 9);
+        ctx.lineTo(cvs.width / 2 + 9, cvs.height / 2);
+        ctx.lineTo(cvs.width / 2 - 6, cvs.height / 2 + 9);
+        ctx.fill();
+        t += 1.5;
+        requestAnimationFrame(loop);
+      }
+      loop();
+    }
+  </script>
+</body>
+</html>
